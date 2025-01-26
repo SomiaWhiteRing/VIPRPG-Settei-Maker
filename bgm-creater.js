@@ -204,6 +204,18 @@
   function loadCharacterData() {
     try {
       // 使用GM_getResourceText读取JSON文件
+      const storedData = localStorage.getItem('CHARACTERS_JSON');
+      if (storedData) {
+        try {
+          const characters = JSON.parse(storedData);
+          console.log('Loaded from localStorage:', characters);
+          displayCharacters(characters);
+          return;
+        } catch (e) {
+          console.error('Error parsing localStorage data:', e);
+          localStorage.removeItem('CHARACTERS_JSON');
+        }
+      }
       const jsonData = GM_getResourceText('CHAR_DATA');
       const characters = JSON.parse(jsonData);
       console.log('Successfully loaded characters:', characters);
@@ -214,6 +226,7 @@
         return;
       }
 
+      localStorage.setItem('CHARACTERS_JSON', jsonData);
       displayCharacters(characters);
     } catch (error) {
       console.error('Error loading characters:', error);
@@ -241,6 +254,7 @@
         reader.onload = (event) => {
           try {
             const characters = JSON.parse(event.target.result);
+            localStorage.setItem('CHARACTERS_JSON', event.target.result);
             displayCharacters(characters);
           } catch (err) {
             list.innerHTML = `<div style="color: red;">JSON解析失败: ${err.message}</div>`;
@@ -904,4 +918,4 @@
 
   // 替换原有的初始化代码
   init();
-})(); 
+})();
